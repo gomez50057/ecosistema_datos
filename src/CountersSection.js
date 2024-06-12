@@ -15,7 +15,10 @@ const Counter = ({ target, text, startCounting }) => {
       const totalFrames = Math.round(duration / frameRate);
 
       const counter = setInterval(() => {
-        start += 1;
+        start += Math.ceil(end / totalFrames);
+        if (start > end - slowDown) {
+          start = end - slowDown;
+        }
         setCount(start);
 
         if (start >= end - slowDown) {
@@ -26,18 +29,28 @@ const Counter = ({ target, text, startCounting }) => {
             if (start >= end) {
               clearInterval(slowCounter);
             }
-          }, 100);
+          }, 50);
         }
       }, duration / totalFrames);
 
-      return () => clearInterval(counter);
+      return () => {
+        clearInterval(counter);
+      };
     }
   }, [startCounting, target]);
 
+  const formatNumber = (num) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const formattedText = text.split(' ').map((word, index) => (
+    <span key={index} className="counter-text-line">{word}</span>
+  ));
+
   return (
     <div className="counter">
-      <div className="counter-value">{count}+</div>
-      <div className="counter-text">{text}</div>
+      <div className="counter-value">{formatNumber(count)}+</div>
+      <div className="counter-text">{formattedText}</div>
     </div>
   );
 };
@@ -74,9 +87,9 @@ const CountersSection = () => {
     <div className="counters-section" ref={sectionRef}>
       {visible && (
         <>
-          <Counter target={100} text="masivo" startCounting={visible} />
-          <Counter target={110} text="masivo" startCounting={visible} />
-          <Counter target={120} text="masivo" startCounting={visible} />
+          <Counter target={32000} text="Habitantes Encuestados" startCounting={visible} />
+          <Counter target={70} text="Municipios visitados" startCounting={visible} />
+          <Counter target={30000} text="Propuestas" startCounting={visible} />
         </>
       )}
     </div>
